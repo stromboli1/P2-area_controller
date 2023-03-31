@@ -1,5 +1,3 @@
-
-
 class ControlProtocol():
 
     def __init__(self):
@@ -11,19 +9,19 @@ class ControlProtocol():
         self.packet = b''
         self.flags = 0
 
-    def get_packet(self) -> bytes:
-        """get_packet.
+    def __repr__(self) -> str:
+        """Returns parameters
 
         Args:
             self:
 
         Returns:
-            bytes: packet
+            str: packet as hex
         """
-        return self.flags.to_bytes(1, 'big') + self.packet
+        return (self.flags.to_bytes(1, 'big') + self.packet).hex()
 
     def add_clksync(self, clk: int) -> None:
-        """add_clksync.
+        """Adds clock syncronization parameter
 
         Args:
             self:
@@ -32,11 +30,13 @@ class ControlProtocol():
         Returns:
             None:
         """
-        self.flags += 1
-        recompile(clk = clk.to_bytes(4, 'big'))
+        newflags = self.flags
+        newflags |= 1
+        self.recompile(newflags, clk = clk.to_bytes(4, 'big'))
+        self.flags = newflags
 
-    def add_onoff(self, onoff: bool, devices: int) -> None:
-        """add_onoff.
+    def add_devices(self, onoff: bool, devices: int) -> None:
+        """Adds device parameter
 
         Args:
             self:
@@ -46,12 +46,15 @@ class ControlProtocol():
         Returns:
             None:
         """
-        self.flags += 8
-        if onoff: self.flags += 4
-        recompile(devices = devices.to_bytes(1, 'big'))
+        newflags = self.flags
+        newflags |= 8
+        if onoff: newflags |= 4
+        else: newflags &= ~4
+        self.recompile(newflags, devices = devices.to_bytes(1, 'big'))
+        self.flags = newflags
 
     def decompile(self) -> tuple[bytes, list[bytes], bytes]:
-        """decompile.
+        """Decompiles the packet and extracts parameters
 
         Args:
             self:
@@ -69,31 +72,33 @@ class ControlProtocol():
             cursor += 4
 
         if self.flags & 8 > 0:
-            devices = self.packet[cursor]
+            devices = self.packet[cursor].to_bytes(1, 'big')
             cursor += 1
 
         return (clk, paramlist, devices)
 
-    def recompile(self, **kwargs) -> None:
-        """recompile.
+    def recompile(self, newflags: int, **kwargs: bytes | list[bytes]) -> None:
+        """Recompiles the packet with new parameters
 
         Args:
             self:
-            kwargs:
+            kwargs (bytes | list[bytes]): kwargs
 
         Returns:
             None:
         """
-        clk, paramlist, devices = decompile()
+        clk, paramlist, devices = self.decompile()
         self.packet = b''
 
-        if self.flags & 1 > 0:
+        #Verifies if there is a clock parameter
+        if newflags & 1 > 0:
             clk = kwargs.get('clk', clk)
             if not clk:
                 raise Exception('clk not set')
             self.packet += clk
 
-        if self.flags & 8 > 0:
+        #Verifies if there is a device parameter
+        if newflags & 8 > 0:
             devices = kwargs.get('devices', devices)
             if not devices:
                 raise Exception('devices not set')
