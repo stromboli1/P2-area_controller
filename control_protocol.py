@@ -32,6 +32,24 @@ class ControlPacket():
         """
         return self.flags.to_bytes(1, 'big') + self.packet
 
+    def print_packet(self) -> None:
+        clk, paramlist, devices = self.decompile()
+
+        print("--- Packet Breakdown ---")
+        print("Flags:")
+        print(f"{self.flags:08b}")
+        print()
+
+        if clk:
+            clk_int = int.from_bytes(clk, 'big')
+            print("CLK Sync:")
+            print(f"{clk_int:032b} ({clk_int})")
+
+        if devices:
+            devices_int = int.from_bytes(devices, 'big')
+            print("Devices:")
+            print(f"{devices_int:032b} ({devices_int})")
+
     def add_clksync(self, clk: int) -> None:
         """Adds clock syncronization parameter
 
