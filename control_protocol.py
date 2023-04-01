@@ -44,11 +44,13 @@ class ControlPacket():
             clk_int = int.from_bytes(clk, 'big')
             print("CLK Sync:")
             print(f"{clk_int:032b} ({clk_int})")
+            print("")
 
         if devices:
             devices_int = int.from_bytes(devices, 'big')
             print("Devices:")
             print(f"{devices_int:032b}")
+            print("")
 
     def add_clksync(self, clk: int) -> None:
         """Adds clock syncronization parameter
