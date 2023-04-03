@@ -75,25 +75,25 @@ class ControlPacket():
         # Save the new flags
         self.flags = newflags
 
-def add_paramlist(self, paramlist: list[bytes]):
-    """Adds parameters.
+    def add_paramlist(self, paramlist: list[bytes]):
+        """Adds parameters.
 
-    Args:
-        self:
-        paramlist (list[bytes]): list of parameters
-    """
+        Args:
+            self:
+            paramlist (list[bytes]): list of parameters
+        """
 
-    # Extract flags to a temp variable
-    newflags = self.Flags
+        # Extract flags to a temp variable
+        newflags = self.Flags
 
-    # Set the flag bit
-    newflags |= 2
+        # Set the flag bit
+        newflags |= 2
 
-    # Recompile packet with new paramlist
-    self.recompile(newflags, paramlist = paramlist)
+        # Recompile packet with new paramlist
+        self.recompile(newflags, paramlist = paramlist)
 
-    # Save the new flags
-    self.flags = newflags
+        # Save the new flags
+        self.flags = newflags
 
     def add_devices(self, onoff: bool, devices: int) -> None:
         """Adds device parameter
@@ -203,4 +203,3 @@ def add_paramlist(self, paramlist: list[bytes]):
             if not devices:
                 raise Exception('devices not set')
             self.packet += devices
-
