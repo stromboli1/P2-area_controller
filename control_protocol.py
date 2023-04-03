@@ -46,6 +46,22 @@ class ControlPacket():
             print(f"{clk_int:032b} ({clk_int})")
             print("")
 
+        if paramlist:
+            paramnum = len(paramlist)
+            print("Number of parameters:")
+            print(f"{paramnum:08b} ({paramnum})")
+            print("")
+
+            print("Param ID\tParam Size\tParam Data")
+            for param in paramlist:
+                paramid = param[0]
+                print(f"{paramid:08b} ({paramid})\t", end="")
+                paramsize = param[1]
+                print(f"{paramsize:08b} ({paramsize})\t", end="")
+                for byte in param[2:]:
+                    print(f"{byte:08b}", end="")
+            print("")
+
         if devices:
             devices_int = int.from_bytes(devices, 'big')
             print("Devices:")
