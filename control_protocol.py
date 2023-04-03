@@ -122,6 +122,23 @@ class ControlPacket():
             clk = self.packet[cursor:cursor+4]
             cursor += 4
 
+        # Decompile params
+        if self.flags & 2 > 0:
+            paramnum = self.packet[cursor]
+            cursor += 1
+            
+            paramlist = []
+            for _ in range(paramnum):
+                paramid = self.packet[cursor]
+                paramsize = self.packet[cursor+1]
+                cursor += 2
+                paramdata = self.packet[cursor:cursor+paramsize]
+                cursor += paramsize
+                parambytes = paramid.to_bytes(1, 'big') + paramsize.to_bytes(1, 'big') + paramdata
+                paramlist.append(parambytes)
+
+            cursor += 1
+
         # Decompile devices
         if self.flags & 8 > 0:
             devices = self.packet[cursor].to_bytes(1, 'big')
