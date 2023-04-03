@@ -84,7 +84,7 @@ class ControlPacket():
         """
 
         # Extract flags to a temp variable
-        newflags = self.Flags
+        newflags = self.flags
 
         # Set the flag bit
         newflags |= 2
