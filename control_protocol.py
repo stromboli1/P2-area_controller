@@ -1,7 +1,7 @@
 class ControlPacket():
 
     def __init__(self):
-        """Contructor for the class
+        """Constructor for the class
 
         Args:
             self:
@@ -49,7 +49,7 @@ class ControlPacket():
         if devices:
             devices_int = int.from_bytes(devices, 'big')
             print("Devices:")
-            print(f"{devices_int:032b}")
+            print(f"{devices_int:08b}")
             print("")
 
     def add_clksync(self, clk: int) -> None:
