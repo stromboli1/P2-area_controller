@@ -75,6 +75,26 @@ class ControlPacket():
         # Save the new flags
         self.flags = newflags
 
+def add_paramlist(self, paramlist: list[bytes]):
+    """Adds parameters.
+
+    Args:
+        self:
+        paramlist (list[bytes]): list of parameters
+    """
+
+    # Extract flags to a temp variable
+    newflags = self.Flags
+
+    # Set the flag bit
+    newflags |= 2
+
+    # Recompile packet with new paramlist
+    self.recompile(newflags, paramlist = paramlist)
+
+    # Save the new flags
+    self.flags = newflags
+
     def add_devices(self, onoff: bool, devices: int) -> None:
         """Adds device parameter
 
@@ -126,7 +146,7 @@ class ControlPacket():
         if self.flags & 2 > 0:
             paramnum = self.packet[cursor]
             cursor += 1
-            
+
             paramlist = []
             for _ in range(paramnum):
                 paramid = self.packet[cursor]
@@ -170,9 +190,17 @@ class ControlPacket():
                 raise Exception('clk not set')
             self.packet += clk
 
+        if newflags & 2 > 0:
+            paramlist = kwargs.get('paramlist', paramlist)
+            if not paramlist:
+                raise Exception('paramlist not set')
+            self.packet += len(paramlist).to_bytes(1, 'big')
+            for param in paramlist: self.packet += param
+
         # Add new devices or add the old one back
         if newflags & 8 > 0:
             devices = kwargs.get('devices', devices)
             if not devices:
                 raise Exception('devices not set')
             self.packet += devices
+
