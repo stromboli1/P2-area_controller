@@ -6,6 +6,7 @@ class ControlPacket():
         Args:
             self:
         """
+
         # Set Global Variables
         self.packet = b''
         self.flags = 0
@@ -41,25 +42,33 @@ class ControlPacket():
         Returns:
             None:
         """
+
+        # Decompile Parameters
         clk, paramlist, devices = self.decompile()
 
+        # Print the flags in binary notation
         print("--- Packet Breakdown ---")
         print("Flags:")
         print(f"{self.flags:08b}")
         print()
 
+        # Print clk sync in binary notation
         if clk:
             clk_int = int.from_bytes(clk, 'big')
             print("CLK Sync:")
             print(f"{clk_int:032b} ({clk_int})")
             print("")
 
+        # Print sim parameters in binary
         if paramlist:
+
+            # Print the number of parameters
             paramnum = len(paramlist)
             print("Number of parameters:")
             print(f"{paramnum:08b} ({paramnum})")
             print("")
 
+            # Print each parameter
             print("Param ID\tParam Size\tParam Data")
             for param in paramlist:
                 paramid = param[0]
@@ -70,6 +79,7 @@ class ControlPacket():
                     print(f"{byte:08b}", end="")
             print("")
 
+        # Print devices in binary notation
         if devices:
             devices_int = int.from_bytes(devices, 'big')
             print("Devices:")
