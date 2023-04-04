@@ -33,6 +33,14 @@ class ControlPacket():
         return self.flags.to_bytes(1, 'big') + self.packet
 
     def print_packet(self) -> None:
+        """Method for printing packet in a readable manner.
+
+        Args:
+            self:
+
+        Returns:
+            None:
+        """
         clk, paramlist, devices = self.decompile()
 
         print("--- Packet Breakdown ---")
