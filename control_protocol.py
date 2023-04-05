@@ -232,13 +232,13 @@ class ControlPacket():
         if newflags & 1 > 0:
             clk: bytes = kwargs.get('clk', clk)
             if not clk:
-                raise Exception('clk not set')
+                raise ValueError('clk not set')
             self.packet += clk
 
         if newflags & 2 > 0:
             paramlist: list[bytes] = kwargs.get('paramlist', paramlist)
             if not paramlist:
-                raise Exception('paramlist not set')
+                raise ValueError('paramlist not set')
             self.packet += len(paramlist).to_bytes(1, 'big')
             for param in paramlist: self.packet += param
 
@@ -246,5 +246,5 @@ class ControlPacket():
         if newflags & 8 > 0:
             devices: bytes = kwargs.get('devices', devices)
             if not devices:
-                raise Exception('devices not set')
+                raise ValueError('devices not set')
             self.packet += devices
