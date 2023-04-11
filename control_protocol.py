@@ -1,8 +1,10 @@
-from typing import Union, Optional
+from typing import Union, Optional, Self
 
 class ControlPacket():
+    """Control Protocol Packet.
+    """
 
-    def __init__(self):
+    def __init__(self: Self):
         """Constructor for the class
 
         Args:
@@ -13,7 +15,7 @@ class ControlPacket():
         self.packet: bytes = b''
         self.flags: int = 0
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """Returns parameters as a hex string
 
         Args:
@@ -24,7 +26,7 @@ class ControlPacket():
         """
         return self.get_packet().hex()
 
-    def get_packet(self) -> bytes:
+    def get_packet(self: Self) -> bytes:
         """Method to get the full packet.
 
         Args:
@@ -35,7 +37,7 @@ class ControlPacket():
         """
         return self.flags.to_bytes(1, 'big') + self.packet
 
-    def print_packet(self) -> None:
+    def print_packet(self: Self) -> None:
         """Method for printing packet in a readable manner.
 
         Args:
@@ -91,7 +93,7 @@ class ControlPacket():
             print(f"{devices_int:08b}")
             print("")
 
-    def add_clksync(self, clk: int) -> None:
+    def add_clksync(self: Self, clk: int) -> None:
         """Adds clock syncronization parameter
 
         Args:
@@ -114,7 +116,7 @@ class ControlPacket():
         # Save the new flags
         self.flags: int = newflags
 
-    def add_paramlist(self, paramlist: list[bytes]):
+    def add_paramlist(self: Self, paramlist: list[bytes]):
         """Adds parameters.
 
         Args:
@@ -134,7 +136,7 @@ class ControlPacket():
         # Save the new flags
         self.flags: int = newflags
 
-    def add_devices(self, onoff: bool, devices: int) -> None:
+    def add_devices(self: Self, onoff: bool, devices: int) -> None:
         """Adds device parameter
 
         Args:
@@ -160,7 +162,7 @@ class ControlPacket():
         # Save the new flags
         self.flags: int = newflags
 
-    def decompile(self) -> tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]:
+    def decompile(self: Self) -> tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]:
         """Decompiles the packet and extracts parameters
 
         Args:
@@ -208,7 +210,7 @@ class ControlPacket():
 
         return (clk, paramlist, devices)
 
-    def recompile(self, newflags: int, **kwargs: Union[bytes, list[bytes]]) -> None:
+    def recompile(self: Self, newflags: int, **kwargs: Union[bytes, list[bytes]]) -> None:
         """Recompiles the packet with new parameters
 
         Args:
