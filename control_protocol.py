@@ -49,9 +49,9 @@ class ControlPacket():
 
         # Decompile Parameters
         decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self.decompile()
-        clk: Optional[bytes] = decompiled(0)
-        paramlist: Optional[list[bytes]] = decompiled(1)
-        devices: Optional[bytes] = decompiled(2)
+        clk: Optional[bytes] = decompiled[0]
+        paramlist: Optional[list[bytes]] = decompiled[1]
+        devices: Optional[bytes] = decompiled[2]
 
         # Print the flags in binary notation
         print("--- Packet Breakdown ---")
@@ -223,9 +223,9 @@ class ControlPacket():
 
         # Decompile the parameters
         decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self.decompile()
-        clk: Optional[bytes] = decompiled(0)
-        paramlist: Optional[list[bytes]] = decompiled(1)
-        devices: Optional[bytes] = decompiled(2)
+        clk: Optional[bytes] = decompiled[0]
+        paramlist: Optional[list[bytes]] = decompiled[1]
+        devices: Optional[bytes] = decompiled[2]
 
         # Reset packet
         self.packet: bytes = b''
