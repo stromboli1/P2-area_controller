@@ -121,7 +121,7 @@ class ControlPacket():
         # Save the new flags
         self._flags: int = newflags
 
-    def add_parameter(self: Self, param_id: int, param_data: Union[int, bool, float]) -> None:
+    def add_parameter(self: Self, param_id: int, param_data: Union[bool, int, float]) -> None:
         """Adds a new parameter.
 
         Args:
@@ -151,13 +151,23 @@ class ControlPacket():
 
         # Check what type of data we need to add
         match param_data:
-            # If integer or bool (bools are 0 and 1)
+
+            # If boolean
+            case bool():
+                # Set the size of parameter data
+                psize: int = 1
+
+                # Convert the boolean to bytes (as an integer)
+                pdata = param_data.to_bytes(1, 'big')
+
+            # If integer
             case int():
                 # Calculate size of parameter data
                 psize: int = (param_data.bit_length() + 7) // 8
 
                 # Convert integer to bytes
                 pdata: bytes = param_data.to_bytes(psize, 'big')
+            
             # If floating point
             case float():
                 # Set the size of parameter data
@@ -165,6 +175,7 @@ class ControlPacket():
 
                 # Pack the float with struct
                 pdata: bytes = struct.pack('>d', param_data)
+            
             # Default case/fallback
             case _:
                 raise ValueError("Parameter data not of accepted type")
@@ -313,10 +324,8 @@ class ControlPacket():
                 # Make an empty parameter list
                 paramlist = []
 
-
             # Check that we have a new parameter set
             if param:
-
                 # Make index variable to track where
                 # the new parameter needs to be inserted
                 index = -1
