@@ -51,7 +51,7 @@ class ControlPacket():
         """
 
         # Decompile Parameters
-        decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self.decompile()
+        decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self._decompile()
         clk: Optional[bytes] = decompiled[0]
         paramlist: Optional[list[bytes]] = decompiled[1]
         devices: Optional[bytes] = decompiled[2]
@@ -116,7 +116,7 @@ class ControlPacket():
         newflags |= 1
 
         # Recompile packet with new clock sync
-        self.recompile(newflags, clk = clk.to_bytes(4, 'big'))
+        self._recompile(newflags, clk = clk.to_bytes(4, 'big'))
 
         # Save the new flags
         self._flags: int = newflags
@@ -173,7 +173,7 @@ class ControlPacket():
         param += psize.to_bytes(1, 'big')
         param += pdata
 
-        self.recompile(newflags, param = param)
+        self._recompile(newflags, param = param)
 
         # Save the new flags
         self._flags: int = newflags
@@ -199,12 +199,12 @@ class ControlPacket():
         else: newflags &= ~4
 
         # Recompile packet with new devices
-        self.recompile(newflags, devices = devices.to_bytes(1, 'big'))
+        self._recompile(newflags, devices = devices.to_bytes(1, 'big'))
 
         # Save the new flags
         self._flags: int = newflags
 
-    def decompile(self: Self) -> tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]:
+    def _decompile(self: Self) -> tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]:
         """Decompiles the packet and extracts parameters
 
         Args:
@@ -259,7 +259,7 @@ class ControlPacket():
         # Return the decompiled packet
         return (clk, paramlist, devices)
 
-    def recompile(self: Self, newflags: int, **kwargs: bytes) -> None:
+    def _recompile(self: Self, newflags: int, **kwargs: bytes) -> None:
         """Recompiles the packet with new parameters
 
         Args:
@@ -274,7 +274,7 @@ class ControlPacket():
         """
 
         # Decompile the parameters
-        decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self.decompile()
+        decompiled: tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]] = self._decompile()
         clk: Optional[bytes] = decompiled[0]
         paramlist: Optional[list[bytes]] = decompiled[1]
         devices: Optional[bytes] = decompiled[2]
