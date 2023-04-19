@@ -85,6 +85,7 @@ class ControlPacket():
                 print(f"{paramid:08b} ({paramid})\t", end="")
                 paramsize: int = param[1]
                 print(f"{paramsize:08b} ({paramsize})\t", end="")
+                # Print each byte as binary
                 for byte in param[2:]:
                     print(f"{byte:08b}", end="")
             print("")
@@ -119,7 +120,7 @@ class ControlPacket():
         # Save the new flags
         self._flags: int = newflags
 
-    def add_parameter(self: Self, param_id: int, param_data: Union[float, int, bool]) -> None:
+    def add_parameter(self: Self, param_id: int, param_data: Union[int, bool, float]) -> None:
         """Adds a new parameter.
 
         Args:
@@ -149,24 +150,21 @@ class ControlPacket():
 
         # Check what type of data we need to add
         match param_data:
-            case float():
-                # Set the size of parameter data
-                psize: int = 8
-
-                # Pack the float with struct
-                pdata: bytes = struct.pack('>d', param_data)
-            case bool():
-                # Set the size of parameter data
-                psize: int = 1
-
-                # Make the bool a byte
-                pdata: bytes = b'\x01' if param_data else b'\x00'
+            # If integer or bool (bools are 0 and 1)
             case int():
                 # Calculate size of parameter data
                 psize: int = (param_data.bit_length() + 7) // 8
 
                 # Convert integer to bytes
                 pdata: bytes = param_data.to_bytes(psize, 'big')
+            # If floating point
+            case float():
+                # Set the size of parameter data
+                psize: int = 8
+
+                # Pack the float with struct
+                pdata: bytes = struct.pack('>d', param_data)
+            # Default case/fallback
             case _:
                 raise ValueError("Parameter data not of accepted type")
 
@@ -231,17 +229,25 @@ class ControlPacket():
             paramnum: int = self._packet[cursor]
             cursor += 1
 
+            # Make variable to collect parameters in
             paramlist: list[bytes] = []
+
+            # Loop over all parameters
             for _ in range(paramnum):
+
+                # Collect their id and size
                 paramid: int = self._packet[cursor]
                 paramsize: int = self._packet[cursor+1]
                 cursor += 2
 
+                # Collect the data bytes
                 paramdata: bytes = self._packet[cursor:cursor+paramsize]
                 cursor += paramsize
 
+                # Recreate the parameter bytes
                 parambytes: bytes = paramid.to_bytes(1, 'big') + paramsize.to_bytes(1, 'big') + paramdata
 
+                # Add the bytes to the list
                 paramlist.append(parambytes)
 
         # Decompile devices
@@ -249,6 +255,7 @@ class ControlPacket():
             devices: bytes = self._packet[cursor].to_bytes(1, 'big')
             cursor += 1
 
+        # Return the decompiled packet
         return (clk, paramlist, devices)
 
     def recompile(self: Self, newflags: int, **kwargs: bytes) -> None:
@@ -260,6 +267,9 @@ class ControlPacket():
 
         Returns:
             None:
+
+        Raises:
+            ValueError: Packet part is not set
         """
 
         # Decompile the parameters
@@ -273,25 +283,77 @@ class ControlPacket():
 
         # Add new clock or add the old one back
         if newflags & 1 > 0:
+
+            # Extract new clock from the arguments
             clk: bytes = kwargs.get('clk', clk)
+
+            # Check that the clock is set,
+            # either from arguments or decompiled packet
             if not clk:
                 raise ValueError('clk not set')
+
+            # Add the clock bytes
             self._packet += clk
 
+        # Add new parameter to the list,
+        # or compile the old one back
         if newflags & 2 > 0:
-            param: bytes = kwargs.get('param', None)
-            if not paramlist and not param:
-                raise ValueError('paramlist not set')
-            elif param:
-                # TODO: make us able to change an already set parameter
-                paramlist = paramlist if paramlist else []
-                paramlist.append(param)
-            self._packet += len(paramlist).to_bytes(1, 'big')
-            for param in paramlist: self._packet += param
 
-        # Add new devices or add the old one back
+            # Extract parameter from the arguments
+            param: bytes = kwargs.get('param', None)
+
+            # Check if we have a parameter list from the packet
+            if not paramlist:
+
+                # Make sure that we have a new parameter set
+                if not param:
+                    raise ValueError('paramlist or param not set')
+
+                # Make an empty parameter list
+                paramlist = []
+
+
+            # Check that we have a new parameter set
+            if param:
+
+                # Make index variable to track where
+                # the new parameter needs to be inserted
+                index = -1
+
+                # Loop through all parameter and check
+                # if we already have one with the same id
+                for i, p in enumerate(paramlist):
+                    if p[0] == param[0]:
+                        # If we do save the index
+                        index = i
+                        break
+
+                if index > 0:
+                    # If we saved an index replaced the parameter
+                    # at that index with our new parameter
+                    paramlist: list[bytes] = paramlist[:i] + \
+                            [param] + \
+                            paramlist[i+1:]
+                else:
+                    # Else just append it
+                    paramlist.append(param)
+
+            # Write the parameter length
+            self._packet += len(paramlist).to_bytes(1, 'big')
+
+            # Add all parameter bytes to the packet
+            for p in paramlist: self._packet += p
+
+        # Add new device signal or add the old one back
         if newflags & 8 > 0:
+
+            # Extract device signal from arguments
             devices: bytes = kwargs.get('devices', devices)
+
+            # Check that a device signal is set,
+            # either from arguments or decompiled packet
             if not devices:
                 raise ValueError('devices not set')
+
+            # Add device signal bytes
             self._packet += devices
