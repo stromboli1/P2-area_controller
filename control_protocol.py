@@ -88,6 +88,7 @@ class ControlPacket():
                 # Print each byte as binary
                 for byte in param[2:]:
                     print(f"{byte:08b}", end="")
+                print("")
             print("")
 
         # Print devices in binary notation
