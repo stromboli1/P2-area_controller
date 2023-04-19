@@ -342,8 +342,22 @@ class ControlPacket():
             # Write the parameter length
             self._packet += len(paramlist).to_bytes(1, 'big')
 
-            # Add all parameter bytes to the packet
-            for p in paramlist: self._packet += p
+            # Sort and reorder the parameters by id
+            # Make a list to hold the ordering
+            # contents: (id, index)
+            order_list: list[tuple[int, int]] = []
+
+            # Loop over all parameters,
+            # add their id and index to the list
+            for i, p in enumerate(paramlist):
+                order_list.append((p[0], i))
+
+            # Sort the list by the id
+            order_list.sort(key=lambda x: x[0])
+
+            # Add the parameters in order from the list
+            for _, index in order_list:
+                self._packet += paramlist[index]
 
         # Add new device signal or add the old one back
         if newflags & 8 > 0:
