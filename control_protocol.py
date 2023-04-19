@@ -1,47 +1,50 @@
 from typing import Union, Optional, Self
+import struct
 
 class ControlPacket():
     """Control Protocol Packet.
     """
 
+    # Global Variables
+    _packet: bytes = b''
+    _flags: int = 0
+
     def __init__(self: Self):
-        """Constructor for the class
+        """Initialize the packet.
 
         Args:
-            self:
+            self (Self): self
         """
 
-        # Set Global Variables
-        self.packet: bytes = b''
-        self.flags: int = 0
-
     def __repr__(self: Self) -> str:
-        """Returns parameters as a hex string
+        """Represent packet as a hex string
 
         Args:
-            self:
+            self (Self): self
 
         Returns:
             str: packet as hex
         """
+
         return self.get_packet().hex()
 
     def get_packet(self: Self) -> bytes:
         """Method to get the full packet.
 
         Args:
-            self:
+            self (Self): self
 
         Returns:
             bytes: Packet with flags appended
         """
-        return self.flags.to_bytes(1, 'big') + self.packet
+
+        return self._flags.to_bytes(1, 'big') + self._packet
 
     def print_packet(self: Self) -> None:
         """Method for printing packet in a readable manner.
 
         Args:
-            self:
+            self (Self): self
 
         Returns:
             None:
@@ -56,7 +59,7 @@ class ControlPacket():
         # Print the flags in binary notation
         print("--- Packet Breakdown ---")
         print("Flags:")
-        print(f"{self.flags:08b}")
+        print(f"{self._flags:08b}")
         print()
 
         # Print clk sync in binary notation
@@ -97,7 +100,7 @@ class ControlPacket():
         """Adds clock syncronization parameter
 
         Args:
-            self:
+            self (Self): self
             clk (int): clock time
 
         Returns:
@@ -105,7 +108,7 @@ class ControlPacket():
         """
 
         # Extract flags to a temp variable
-        newflags: int = self.flags
+        newflags: int = self._flags
 
         # Set the flag bit
         newflags |= 1
@@ -114,33 +117,73 @@ class ControlPacket():
         self.recompile(newflags, clk = clk.to_bytes(4, 'big'))
 
         # Save the new flags
-        self.flags: int = newflags
+        self._flags: int = newflags
 
-    def add_paramlist(self: Self, paramlist: list[bytes]):
-        """Adds parameters.
+    def add_parameter(self: Self, param_id: int, param_data: Union[float, int, bool]) -> None:
+        """Adds a new parameter.
 
         Args:
-            self:
-            paramlist (list[bytes]): list of parameters
+            self (Self): self
+            param_id (int): ID of the parameter
+            param_data (Union[float, int, bool]): The data of the parameter
+
+        Returns:
+            None:
         """
 
         # Extract flags to a temp variable
-        newflags: int = self.flags
+        newflags: int = self._flags
 
         # Set the flag bit
         newflags |= 2
 
-        # Recompile packet with new paramlist
-        self.recompile(newflags, paramlist = paramlist)
+        # Create a new parameter
+        param: bytes = b''
+
+        # Add id to the parameter
+        param += param_id.to_bytes(1, 'big')
+
+        # Create temporary variables to hold the size and byte data
+        psize: int = 0
+        pdata: bytes = b''
+
+        # Check what type of data we need to add
+        match param_data:
+            case float():
+                # Set the size of parameter data
+                psize: int = 8
+
+                # Pack the float with struct
+                pdata: bytes = struct.pack('>d', param_data)
+            case bool():
+                # Set the size of parameter data
+                psize: int = 1
+
+                # Make the bool a byte
+                pdata: bytes = b'\x01' if param_data else b'\x00'
+            case int():
+                # Calculate size of parameter data
+                psize: int = (param_data.bit_length() + 7) // 8
+
+                # Convert integer to bytes
+                pdata: bytes = param_data.to_bytes(psize, 'big')
+            case _:
+                raise ValueError("Parameter data not of accepted type")
+
+        # Set the calculated size and data
+        param += psize.to_bytes(1, 'big')
+        param += pdata
+
+        self.recompile(newflags, param = param)
 
         # Save the new flags
-        self.flags: int = newflags
+        self._flags: int = newflags
 
     def add_devices(self: Self, onoff: bool, devices: int) -> None:
         """Adds device parameter
 
         Args:
-            self:
+            self (Self): self
             onoff (bool): Should the devices be turned on or off?
             devices (int): Devices to affect
 
@@ -149,7 +192,7 @@ class ControlPacket():
         """
 
         # Extract flags to a temp variable
-        newflags: int = self.flags
+        newflags: int = self._flags
 
         # Set the flag bits
         newflags |= 8
@@ -160,13 +203,13 @@ class ControlPacket():
         self.recompile(newflags, devices = devices.to_bytes(1, 'big'))
 
         # Save the new flags
-        self.flags: int = newflags
+        self._flags: int = newflags
 
     def decompile(self: Self) -> tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]:
         """Decompiles the packet and extracts parameters
 
         Args:
-            self:
+            self (Self): self
 
         Returns:
             tuple[Optional[bytes], Optional[list[bytes]], Optional[bytes]]: Decompiled parameters
@@ -179,43 +222,41 @@ class ControlPacket():
         paramlist: Optional[bytes] = None
 
         # Decompile clock sync
-        if self.flags & 1 > 0:
-            clk: bytes = self.packet[cursor:cursor+4]
+        if self._flags & 1 > 0:
+            clk: bytes = self._packet[cursor:cursor+4]
             cursor += 4
 
         # Decompile params
-        if self.flags & 2 > 0:
-            paramnum: int = self.packet[cursor]
+        if self._flags & 2 > 0:
+            paramnum: int = self._packet[cursor]
             cursor += 1
 
             paramlist: list[bytes] = []
             for _ in range(paramnum):
-                paramid: int = self.packet[cursor]
-                paramsize: int = self.packet[cursor+1]
+                paramid: int = self._packet[cursor]
+                paramsize: int = self._packet[cursor+1]
                 cursor += 2
 
-                paramdata: bytes = self.packet[cursor:cursor+paramsize]
+                paramdata: bytes = self._packet[cursor:cursor+paramsize]
                 cursor += paramsize
 
                 parambytes: bytes = paramid.to_bytes(1, 'big') + paramsize.to_bytes(1, 'big') + paramdata
 
                 paramlist.append(parambytes)
 
-            cursor += 1
-
         # Decompile devices
-        if self.flags & 8 > 0:
-            devices: bytes = self.packet[cursor].to_bytes(1, 'big')
+        if self._flags & 8 > 0:
+            devices: bytes = self._packet[cursor].to_bytes(1, 'big')
             cursor += 1
 
         return (clk, paramlist, devices)
 
-    def recompile(self: Self, newflags: int, **kwargs: Union[bytes, list[bytes]]) -> None:
+    def recompile(self: Self, newflags: int, **kwargs: bytes) -> None:
         """Recompiles the packet with new parameters
 
         Args:
-            self:
-            kwargs (Union[bytes, list[bytes]]): Parameters
+            self (Self): self
+            kwargs (Union[bytes, list[bytes]]): Data to add
 
         Returns:
             None:
@@ -228,25 +269,29 @@ class ControlPacket():
         devices: Optional[bytes] = decompiled[2]
 
         # Reset packet
-        self.packet: bytes = b''
+        self._packet: bytes = b''
 
         # Add new clock or add the old one back
         if newflags & 1 > 0:
             clk: bytes = kwargs.get('clk', clk)
             if not clk:
                 raise ValueError('clk not set')
-            self.packet += clk
+            self._packet += clk
 
         if newflags & 2 > 0:
-            paramlist: list[bytes] = kwargs.get('paramlist', paramlist)
-            if not paramlist:
+            param: bytes = kwargs.get('param', None)
+            if not paramlist and not param:
                 raise ValueError('paramlist not set')
-            self.packet += len(paramlist).to_bytes(1, 'big')
-            for param in paramlist: self.packet += param
+            elif param:
+                # TODO: make us able to change an already set parameter
+                paramlist = paramlist if paramlist else []
+                paramlist.append(param)
+            self._packet += len(paramlist).to_bytes(1, 'big')
+            for param in paramlist: self._packet += param
 
         # Add new devices or add the old one back
         if newflags & 8 > 0:
             devices: bytes = kwargs.get('devices', devices)
             if not devices:
                 raise ValueError('devices not set')
-            self.packet += devices
+            self._packet += devices
