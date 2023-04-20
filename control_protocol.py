@@ -152,22 +152,17 @@ class ControlPacket():
         # Check what type of data we need to add
         match param_data:
 
-            # If boolean
-            case bool():
-                # Set the size of parameter data
-                psize: int = 1
-
-                # Convert the boolean to bytes (as an integer)
-                pdata = param_data.to_bytes(1, 'big')
-
-            # If integer
+            # If integer or boolean (booleans are 0 and 1)
             case int():
                 # Calculate size of parameter data
                 psize: int = (param_data.bit_length() + 7) // 8
 
+                # Make sure that we have at least one byte (0 and False give 0)
+                psize = psize if psize > 0 else 1
+
                 # Convert integer to bytes
                 pdata: bytes = param_data.to_bytes(psize, 'big')
-            
+
             # If floating point
             case float():
                 # Set the size of parameter data
@@ -175,7 +170,7 @@ class ControlPacket():
 
                 # Pack the float with struct
                 pdata: bytes = struct.pack('>d', param_data)
-            
+
             # Default case/fallback
             case _:
                 raise ValueError("Parameter data not of accepted type")
