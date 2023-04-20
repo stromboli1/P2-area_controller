@@ -10,7 +10,7 @@ class ControlPacket():
     _packet: bytes = b''
     _flags: int = 0
 
-    def __init__(self: Self):
+    def __init__(self: Self) -> None:
         """Initialize the packet.
 
         Args:
