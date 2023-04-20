@@ -1,0 +1,10 @@
+{
+	"param1": {
+		"id": 1,
+		"type": "int"
+	},
+	"param2": {
+		"id": 2,
+		"type": "int"
+	}
+}

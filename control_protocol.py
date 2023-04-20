@@ -1,5 +1,6 @@
 from typing import Union, Optional, Self
 import struct
+import json
 
 class ControlPacket():
     """Control Protocol Packet.
@@ -15,6 +16,10 @@ class ControlPacket():
         Args:
             self (Self): self
         """
+
+        # Read in the parameter oracle
+        with open('param_oracle.json', 'r') as fp:
+            self._param_oracle = json.load(fp)
 
     def __repr__(self: Self) -> str:
         """Represent packet as a hex string
@@ -121,7 +126,11 @@ class ControlPacket():
         # Save the new flags
         self._flags: int = newflags
 
-    def add_parameter(self: Self, param_id: int, param_data: Union[bool, int, float]) -> None:
+    def add_parameter(
+            self: Self,
+            param_id: Union[int, str],
+            param_data: Union[bool, int, float]
+            ) -> None:
         """Adds a new parameter.
 
         Args:
@@ -131,6 +140,9 @@ class ControlPacket():
 
         Returns:
             None:
+
+        Raises:
+            ValueError: Invalid id
         """
 
         # Extract flags to a temp variable
@@ -142,6 +154,48 @@ class ControlPacket():
         # Create a new parameter
         param: bytes = b''
 
+        # Variable to hold the name of the param
+        pname: str = ''
+
+        # Make variable to hold the param type
+        ptype: str = ''
+
+        # Make variable to check if the id is valid
+        valid: bool = False
+
+        # Check if id is valid
+        match param_id:
+            # If we use a integer as the id
+            case int():
+                for item in self._param_oracle.items():
+                    if item[1]['id'] == param_id:
+                        valid: bool = True
+                        pname: str = item[0]
+                        ptype: str = item[1]['type']
+                        break
+
+            # If we used the name
+            case str():
+                # Set the pname to the param_id
+                pname: str = param_id
+
+                # Find the correct id for the name
+                item = self._param_oracle.get(pname, None)
+
+                # If we found the item set valid, param_id and type
+                if item:
+                    valid: bool = True
+                    param_id: int = item['id']
+                    ptype: str = item['type']
+
+            case _:
+                # TODO: better error
+                raise ValueError("Hell is burning")
+
+        # if it is not a valid id raise an error
+        if not valid:
+            raise ValueError("Invalid param id or param name")
+
         # Add id to the parameter
         param += param_id.to_bytes(1, 'big')
 
@@ -149,11 +203,18 @@ class ControlPacket():
         psize: int = 0
         pdata: bytes = b''
 
+        # Inner method to check if the ptype is of allowed type
+        def check_allowed_type(types: list[str]) -> None:
+            if not ptype in types:
+                raise ValueError(f'{pname} ({param_id}) cannot be in {types}')
+
         # Check what type of data we need to add
         match param_data:
-
             # If integer or boolean (booleans are 0 and 1)
             case int():
+                # Check if param_data is allowed to be a bool or int
+                check_allowed_type(['bool', 'int'])
+
                 # Calculate size of parameter data
                 psize: int = (param_data.bit_length() + 7) // 8
 
@@ -165,6 +226,9 @@ class ControlPacket():
 
             # If floating point
             case float():
+                # Check if param_data is allowed to be a float
+                check_allowed_type(['float'])
+
                 # Set the size of parameter data
                 psize: int = 8
 
