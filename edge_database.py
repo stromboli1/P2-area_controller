@@ -4,11 +4,11 @@ from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
 url = URL.create(
         drivername="postgresql+psycopg2",
-        username="p2database",
-        password="p2database",
+        username="user",
+        password="password",
         host="localhost",
         port=5432,
-        database="p2database"
+        database="edge_db"
         )
 
 engine = create_engine(url)
