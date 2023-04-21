@@ -10,7 +10,7 @@ class ControlPacket():
     _packet: bytes = b''
     _flags: int = 0
 
-    def __init__(self: Self) -> None:
+    def __init__(self: Self, manifest_file: str = '') -> None:
         """Initialize the packet.
 
         Args:
@@ -20,6 +20,9 @@ class ControlPacket():
         # Read in the parameter oracle
         with open('param_oracle.json', 'r') as fp:
             self._param_oracle = json.load(fp)
+
+        if manifest_file != '':
+            self.create_from_manifest(manifest_file)
 
     def __repr__(self: Self) -> str:
         """Represent packet as a hex string
@@ -102,6 +105,17 @@ class ControlPacket():
             print("Devices:")
             print(f"{devices_int:08b}")
             print("")
+
+    def create_from_manifest(self: Self, manifest_file: str) -> None:
+        with open(manifest_file, 'r') as fp:
+            manifest: dict = json.load(fp)
+
+        self.add_clksync(manifest["time"])
+
+        for param in manifest["parameters"]:
+            self.add_parameter(param["name"], param["value"])
+
+        self.add_devices(manifest["device_signals"]["state"], manifest["device_signals"]["devices"])
 
     def add_clksync(self: Self, clk: int) -> None:
         """Adds clock syncronization parameter
