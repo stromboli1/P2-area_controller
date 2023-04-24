@@ -24,8 +24,6 @@ class HousePool(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
     ip: Mapped[str] = mapped_column(String(30))
-    hd_data: Mapped[list["HDData"]] = relationship(back_populates="house")
-    actions: Mapped[list["ActionPool"]] = relationship(back_populates="house")
 
 class HDData(Base):
     __tablename__ = "hd_data"
@@ -36,7 +34,6 @@ class HDData(Base):
     temperature: Mapped[float] = mapped_column(Float())
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
-    house: Mapped["HousePool"] = relationship(back_populates="hd_data")
 
 class ActionPool(Base):
     __tablename__ = "action_pool"
@@ -44,7 +41,6 @@ class ActionPool(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
-    house: Mapped["HousePool"] = relationship(back_populates="actions")
 
 if __name__ == "__main__":
     Base.metadata.create_all(engine)
