@@ -115,7 +115,10 @@ class ControlPacket():
         for param in manifest["parameters"]:
             self.add_parameter(param["name"], param["value"])
 
-        self.add_devices(manifest["device_signals"]["state"], manifest["device_signals"]["devices"])
+        self.add_devices(
+                manifest["device_signals"]["state"],
+                manifest["device_signals"]["devices"]
+                )
 
     def add_clksync(self: Self, clk: int) -> None:
         """Adds clock syncronization parameter
