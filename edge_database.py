@@ -22,4 +22,5 @@ class HousePool(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-Base.metadata.create_all(engine)
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)
