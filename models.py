@@ -1,6 +1,5 @@
-from sqlalchemy import String, Integer, Float, DateTime, ForeignKey
+from sqlalchemy import String, Integer, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -18,13 +17,13 @@ class HDData(Base):
     device_state: Mapped[int] = mapped_column(Integer())
     power_usage: Mapped[float] = mapped_column(Float())
     temperature: Mapped[float] = mapped_column(Float())
-    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    timestamp: Mapped[int] = mapped_column(Integer())
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
 
 class ActionPool(Base):
     __tablename__ = "action_pool"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    timestamp: Mapped[int] = mapped_column(Integer())
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
 
