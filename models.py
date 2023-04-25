@@ -26,5 +26,6 @@ class ActionPool(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    device: Mapped[int] = mapped_column(Integer())
+    state_change: Mapped[int] = mapped_column(Integer())
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
-
