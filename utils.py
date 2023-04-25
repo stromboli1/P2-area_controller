@@ -11,5 +11,3 @@ url = URL.create(
         )
 
 engine = create_engine(url)
-
-connection = engine.connect()
