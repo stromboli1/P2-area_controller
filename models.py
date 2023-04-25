@@ -1,20 +1,6 @@
-from sqlalchemy import create_engine, String, ForeignKey, Integer, Float, DateTime
-from sqlalchemy.engine import URL
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
+from sqlalchemy import String, Integer, Float, DateTime, ForeignKey
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from datetime import datetime
-
-url = URL.create(
-        drivername="postgresql+psycopg2",
-        username="user",
-        password="password",
-        host="localhost",
-        port=5432,
-        database="edge_db"
-        )
-
-engine = create_engine(url)
-
-connection = engine.connect()
 
 Base = declarative_base()
 
@@ -42,5 +28,3 @@ class ActionPool(Base):
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))
 
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)
