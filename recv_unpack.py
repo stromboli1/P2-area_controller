@@ -21,5 +21,3 @@ while True:
 
     data = byte_message[0]
     house_ip = byte_message[1]
-
-
