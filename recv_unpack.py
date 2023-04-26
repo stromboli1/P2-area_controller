@@ -1,5 +1,6 @@
 #module import
 import socket
+import struct
 from sqlalchemy.orm import sessionmaker
 from utils import engine
 from models import HousePool, HDData
@@ -21,10 +22,10 @@ while True:
     byte_message = soc.recvfrom(1024)
     data, house_addr = byte_message
 
-    device_state = data[0]
-    power_usage = data[1:5]
-    temperature = data[5:9]
-    unix_timestamp = data[9:]
+    device_state: int = data[0]
+    power_usage: float = struct.unpack(">f", data[1:5])[0]
+    temperature: float = struct.unpack(">f", data[5:9])[0]
+    unix_timestamp: int = int.from_bytes(data[9:13], 'big')
 
     house_id = session.query(HousePool).filter(
             HousePool.ip == house_addr[0]
