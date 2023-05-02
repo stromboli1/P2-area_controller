@@ -22,20 +22,24 @@ while True:
     byte_message = soc.recvfrom(1024)
     data, house_addr = byte_message
 
+    #unpack message
     device_state: int = data[0]
     power_usage: float = struct.unpack(">f", data[1:5])[0]
     temperature: float = struct.unpack(">f", data[5:9])[0]
     unix_timestamp: int = int.from_bytes(data[9:13], 'big')
 
+    #find correct house in database
     house_id = session.query(HousePool).filter(
             HousePool.ip == house_addr[0]
             ).first().id
 
+    #create data entry
     entry = HDData(device_state = device_state,
                    power_usage = power_usage,
                    temperature = temperature,
                    timestamp = unix_timestamp,
                    house_id = house_id)
 
+    #commit data
     session.add(entry)
     session.commit()
