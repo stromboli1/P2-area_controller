@@ -55,6 +55,13 @@ def param_check(data: list[tuple[int, float, float, int]]) -> bool:
     return True
 
 def send_command() -> None:
+    """send command to house subcontroller.
+
+    Args:
+
+    Returns:
+        None:
+    """
     global action_flag
     data_list = []
     ip_list = []
