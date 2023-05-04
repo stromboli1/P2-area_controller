@@ -13,14 +13,14 @@ with open('anal_param.json', 'r') as fd:
 Session = sessionmaker(bind = engine)
 session = Session()
 
-def get_data_from_house(house_id: int) -> tuple[int, float, float, float]:
+def get_data_from_house(house_id: int) -> tuple[int, float, float, int]:
     """function for getting data from house.
 
     Args:
         house_id (int): house_id
 
     Returns:
-        tuple[int, float, float, float]:
+        tuple[int, float, float, int]:
     """
     data_object = session.query(HDData).filter(
             HDData.house_id == house_id
@@ -33,4 +33,11 @@ def get_data_from_house(house_id: int) -> tuple[int, float, float, float]:
             data_object.timestamp
             )
 
+def param_check(data: list[tuple[int, float, float, int]]) -> bool:
+    curr_consumption = 0
+    for house in data:
+        curr_consumption += house[1]
 
+    if curr_consumption >= params['max_usage'] * params['tolerance']:
+        return False
+    return True
