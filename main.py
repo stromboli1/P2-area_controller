@@ -25,7 +25,7 @@ class RecvUnpack(Thread):
 
         #listen for incoming messages
         while True:
-            byte_message = soc.recvfrom(1024)
+            byte_message = sock.recvfrom(1024)
             data, house_addr = byte_message
 
             #unpack message

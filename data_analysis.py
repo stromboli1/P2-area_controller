@@ -29,6 +29,9 @@ def get_data_from_house(house_id: int) -> tuple[int, float, float, int]:
     data_object = session.query(HDData).filter(
             HDData.house_id == house_id
             ).order_by(HDData.timestamp.desc()).first()
+    
+    if data_object == None:
+        return None
 
     return (
             data_object.device_state,
@@ -67,7 +70,11 @@ def send_command() -> None:
     ip_list = []
 
     for house in session.query(HousePool):
-        data_list.append(get_data_from_house(house.id))
+        data = get_data_from_house(house.id)
+        if data == None:
+            return
+
+        data_list.append(data)
         ip_list.append(house.ip)
 
     check_var = param_check(data_list)
