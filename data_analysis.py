@@ -1,9 +1,13 @@
 # imports
 import json
+import socket
 from sqlalchemy.orm import sessionmaker
 from models import HousePool, HDData, ActionPool
 from utils import engine
 from control_protocol import ControlPacket
+
+# global variables
+action_flag = None
 
 # read config
 with open('anal_param.json', 'r') as fd:
@@ -34,6 +38,14 @@ def get_data_from_house(house_id: int) -> tuple[int, float, float, int]:
             )
 
 def param_check(data: list[tuple[int, float, float, int]]) -> bool:
+    """checks if max temperature is reached.
+
+    Args:
+        data (list[tuple[int, float, float, int]]): data
+
+    Returns:
+        bool:
+    """
     curr_consumption = 0
     for house in data:
         curr_consumption += house[1]
@@ -41,3 +53,27 @@ def param_check(data: list[tuple[int, float, float, int]]) -> bool:
     if curr_consumption >= params['max_usage'] * params['tolerance']:
         return False
     return True
+
+def send_command() -> None:
+    global action_flag
+    data_list = []
+    ip_list = []
+
+    for house in session.query(HousePool):
+        data_list.append(get_data_from_house(house.id))
+        ip_list.append(house.ip)
+
+    check_var = param_check(data_list)
+
+    if check_var == action_flag:
+        return
+
+    action_flag = check_var
+    packet = ControlPacket()
+    packet.add_devices(check_var, 1)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for ip in ip_list:
+        sock.connect((ip, 42069))
+        sock.send(packet.get_packet())
+        sock.close()
