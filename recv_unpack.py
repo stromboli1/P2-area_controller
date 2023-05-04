@@ -28,6 +28,8 @@ while True:
     temperature: float = struct.unpack(">f", data[5:9])[0]
     unix_timestamp: int = int.from_bytes(data[9:13], 'big')
 
+    print(f"Received from {house_addr}: {device_state} {power_usage} {temperature} {unix_timestamp}")
+
     #find correct house in database
     house_id = session.query(HousePool).filter(
             HousePool.ip == house_addr[0]
