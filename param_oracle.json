@@ -1,0 +1,18 @@
+{
+	"param1": {
+		"id": 1,
+		"type": "int"
+	},
+	"param2": {
+		"id": 2,
+		"type": "int"
+	},
+	"param3": {
+		"id": 3,
+		"type": "float"
+	},
+	"param4": {
+		"id": 4,
+		"type": "bool"
+	}
+}
