@@ -92,3 +92,15 @@ def send_command() -> None:
         sock.connect((ip, 42069))
         sock.send(packet.get_packet())
         sock.close()
+
+        house_entry_id = session.query(HousePool).filter(HousePool.ip == ip).first().id
+
+        action_entry = ActionPool(
+                timestamp = time(),
+                device = 1,
+                state_change = int(action_flag),
+                house_id = house_entry_id
+                )
+
+        session.add(action_entry)
+        session.commit()
