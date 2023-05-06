@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from models import HousePool, HDData, ActionPool
 from utils import engine
 from control_protocol import ControlPacket
+from time import time
 
 # global variables
 action_flag = None
@@ -29,7 +30,7 @@ def get_data_from_house(house_id: int) -> tuple[int, float, float, int]:
     data_object = session.query(HDData).filter(
             HDData.house_id == house_id
             ).order_by(HDData.timestamp.desc()).first()
-    
+
     if data_object == None:
         return None
 
