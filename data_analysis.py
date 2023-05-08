@@ -71,18 +71,23 @@ def send_command() -> None:
     ip_list = []
     id_list = []
 
+    print('pre-for loop')
     for house in session.query(HousePool):
         data = get_data_from_house(house.id)
         if data == None:
-            return
+            print('continues')
+            continue
 
         data_list.append(data)
         ip_list.append(house.ip)
         id_list.append(house.id)
 
+    print(id_list, ip_list)
+
     check_var = param_check(data_list)
 
     if check_var == action_flag:
+        print('check_var = action_flag')
         return
 
     action_flag = check_var
@@ -92,7 +97,9 @@ def send_command() -> None:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     for ip, house_id in zip(ip_list, id_list):
         sock.connect((ip, 42069))
+        print('trying to send')
         sock.send(packet.get_packet())
+        print('command successfully send')
         sock.close()
 
         action_entry = ActionPool(
