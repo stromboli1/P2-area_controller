@@ -90,12 +90,11 @@ def send_command() -> None:
         print('check_var = action_flag')
         return
 
-    action_flag = check_var
     packet = ControlPacket()
     packet.add_devices(check_var, 1)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     for ip, house_id in zip(ip_list, id_list):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((ip, 42069))
         print('trying to send')
         sock.send(packet.get_packet())
@@ -111,3 +110,5 @@ def send_command() -> None:
 
         session.add(action_entry)
         session.commit()
+
+    action_flag = check_var
