@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Float, ForeignKey
+from sqlalchemy import String, Integer, Float, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
 Base = declarative_base()
@@ -26,5 +26,5 @@ class ActionPool(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     timestamp: Mapped[int] = mapped_column(Integer())
     device: Mapped[int] = mapped_column(Integer())
-    state_change: Mapped[int] = mapped_column(Integer())
+    state_change: Mapped[bool] = mapped_column(Boolean())
     house_id: Mapped[int] = mapped_column(ForeignKey("house_pool.id"))

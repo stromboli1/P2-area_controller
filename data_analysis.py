@@ -69,6 +69,7 @@ def send_command() -> None:
     global action_flag
     data_list = []
     ip_list = []
+    id_list = []
 
     for house in session.query(HousePool):
         data = get_data_from_house(house.id)
@@ -77,6 +78,7 @@ def send_command() -> None:
 
         data_list.append(data)
         ip_list.append(house.ip)
+        id_list.append(house.id)
 
     check_var = param_check(data_list)
 
@@ -88,18 +90,16 @@ def send_command() -> None:
     packet.add_devices(check_var, 1)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    for ip in ip_list:
+    for ip, house_id in zip(ip_list, id_list):
         sock.connect((ip, 42069))
         sock.send(packet.get_packet())
         sock.close()
 
-        house_entry_id = session.query(HousePool).filter(HousePool.ip == ip).first().id
-
         action_entry = ActionPool(
                 timestamp = time(),
                 device = 1,
-                state_change = int(check_var),
-                house_id = house_entry_id
+                state_change = check_var,
+                house_id = house_id
                 )
 
         session.add(action_entry)
