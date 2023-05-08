@@ -57,9 +57,10 @@ class SendCommand(Thread):
         while True:
             try:
                 send_command()
-                sleep(1)
-            except:
-                continue
+            except Exception as e:
+                print("Crashed")
+                print(e)
+            sleep(1)
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
