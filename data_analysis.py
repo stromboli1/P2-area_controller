@@ -94,7 +94,7 @@ def send_command() -> None:
     packet.add_devices(check_var, 1)
 
     for ip, house_id in zip(ip_list, id_list):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((ip, 42069))
         print('trying to send')
         sock.send(packet.get_packet())
