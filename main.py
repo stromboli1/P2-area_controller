@@ -55,8 +55,11 @@ class RecvUnpack(Thread):
 class SendCommand(Thread):
     def run(self):
         while True:
-            send_command()
-            sleep(1)
+            try:
+                send_command()
+                sleep(1)
+            except:
+                continue
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
