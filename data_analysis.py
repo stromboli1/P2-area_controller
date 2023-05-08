@@ -98,7 +98,7 @@ def send_command() -> None:
         action_entry = ActionPool(
                 timestamp = time(),
                 device = 1,
-                state_change = int(action_flag),
+                state_change = int(check_var),
                 house_id = house_entry_id
                 )
 
