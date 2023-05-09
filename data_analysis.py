@@ -92,6 +92,7 @@ def send_command() -> None:
 
     packet = ControlPacket()
     packet.add_devices(check_var, 1)
+    packet.print_packet()
 
     for ip, house_id in zip(ip_list, id_list):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
