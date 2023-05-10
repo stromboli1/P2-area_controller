@@ -7,7 +7,7 @@ from models import HousePool, HDData
 from start_protocol import start_houses, stop_houses
 from threading import Thread
 from time import sleep
-from atexit import register
+import atexit
 
 from data_analysis import send_command
 
@@ -65,7 +65,7 @@ class SendCommand(Thread):
             sleep(1)
 
 start_houses()
-register(stop_houses)
+atexit.register(stop_houses)
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
