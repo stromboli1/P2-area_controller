@@ -4,6 +4,7 @@ import struct
 from sqlalchemy.orm import sessionmaker
 from utils import engine
 from models import HousePool, HDData
+from start_protocol import start_houses
 from threading import Thread
 from time import sleep
 
@@ -61,6 +62,8 @@ class SendCommand(Thread):
                 print("Crashed")
                 print(e)
             sleep(1)
+
+start_houses()
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
