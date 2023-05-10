@@ -17,6 +17,7 @@ def start_houses() -> None:
 
 def stop_houses() -> None:
 
+    print('Terminating connections...')
     start_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for house in session.query(HousePool):
         start_sock.sendto(b'\x00', (house.ip, 6969))
