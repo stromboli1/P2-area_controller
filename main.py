@@ -4,7 +4,7 @@ import struct
 from sqlalchemy.orm import sessionmaker
 from utils import engine
 from models import HousePool, HDData
-from start_protocol import start_houses, stop_houses
+from start_protocol import onoff_houses
 from threading import Thread
 from time import sleep
 import atexit
@@ -64,8 +64,8 @@ class SendCommand(Thread):
                 print(e)
             sleep(1)
 
-start_houses()
-atexit.register(stop_houses)
+onoff_houses()
+atexit.register(onoff_houses)
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
