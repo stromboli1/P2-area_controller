@@ -1,7 +1,7 @@
 # imports
 import socket
 
-def onoff_houses(on_off: bool) -> None:
+def onoff_houses(on_off = False) -> None:
 
     start_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     start_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

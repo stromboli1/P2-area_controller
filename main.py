@@ -64,8 +64,8 @@ class SendCommand(Thread):
                 print(e)
             sleep(1)
 
-onoff_houses(True)
-atexit.register(onoff_houses(False))
+onoff_houses(on_off = True)
+atexit.register(onoff_houses)
 
 recv_unpack = RecvUnpack()
 recv_unpack.start()
