@@ -18,30 +18,34 @@ with open('anal_param.json', 'r') as fd:
 Session = sessionmaker(bind = engine)
 session = Session()
 
-def get_data_from_house(house_id: int) -> tuple[int, float, float, int]:
+def get_data_from_houses() -> list[tuple[int, float, float, int, int]]:
     """function for getting data from house.
 
     Args:
         house_id (int): house_id
 
     Returns:
-        tuple[int, float, float, int]:
+        tuple[int, float, float, int] | None:
     """
-    data_object = session.query(HDData).filter(
-            HDData.house_id == house_id
-            ).order_by(HDData.timestamp.desc()).first()
+    data_list = []
+    for house in session.query(HousePool):
+        data_object = session.query(HDData).filter(
+                HDData.house_id == house.id
+                ).order_by(
+                        HDData.timestamp.desc()
+                        ).first()
+        if data_object == None:
+            continue
 
-    if data_object == None:
-        return None
+        data_list.append((data_object.device_state,
+                          data_object.power_usage,
+                          data_object.temperature,
+                          data_object.timestamp,
+                          data_object.house_id
+                         ))
+    return data_list
 
-    return (
-            data_object.device_state,
-            data_object.power_usage,
-            data_object.temperature,
-            data_object.timestamp
-            )
-
-def param_check(data: list[tuple[int, float, float, int]]) -> bool:
+def param_check(data: list[tuple[int, float, float, int, int]]) -> bool | None:
     """checks if max temperature is reached.
 
     Args:
@@ -54,18 +58,85 @@ def param_check(data: list[tuple[int, float, float, int]]) -> bool:
     for house in data:
         curr_consumption += house[1]
 
-    if curr_consumption >= params['max_usage'] * params['tolerance']:
+    if params['min_usage'] < curr_consumption < params['max_usage']:
+        return None
+    if curr_consumption >= params['max_usage']:
         return False
     return True
 
-def send_command() -> None:
-    """send command to house subcontroller.
+def send_command(off_houses: list) -> tuple[int, bool] | None:
 
-    Args:
+    # variables
+    prio_var: float = 0
+    prio_ip: str | None = None
+    prio: int | None = None
+    house_data: list[tuple[int, float, float, int, int]] = get_data_from_houses()
+    onoff: bool | None = param_check(house_data)
 
-    Returns:
-        None:
+    if onoff == None:
+        return
+
+    # checks whether to turn utilities of or on
+    if not onoff:
+
+        # loops over data to find most suitable house to turn off
+        for data in house_data:
+
+            # filter out houses already turned off
+            if data[4] in off_houses:
+                continue
+
+            if data[2] > prio_var:
+                prio_var = data[2]
+                prio = data[4]
+
+    # else statement if utilities have to be turned on
+    else:
+
+        # filters data to find houses that are turned off
+        filter_data = filter(lambda x: x[4] in off_houses, house_data)
+
+        # find suitable house to turn on
+        for data in filter_data:
+            if data[2] < prio_var or prio_var == 0:
+                prio_var = data[2]
+                prio = data[4]
+
+    # find ip of house to take an action within
+    house = session.query(HousePool).filter(HousePool.id == prio).first()
+    if house != None:
+        prio_ip = house.ip
+
+
+    if prio_ip == None or prio == None:
+        print('yeet')
+        return
+
+    # create packet
+    packet = ControlPacket()
+    packet.add_devices(onoff, 1)
+
+    print(f'Trying to turn off {prio}')
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((prio_ip, 42069))
+    sock.send(packet.get_packet())
+
+    # ActionPool entry
+    action_entry = ActionPool(
+            timestamp = time(),
+            device = 1,
+            state_change = onoff,
+            house_id = prio
+            )
+
+    session.add(action_entry)
+    session.commit()
+
+    return prio, onoff
+
     """
+    LEGACY
+
     global action_flag
     data_list = []
     ip_list = []
@@ -113,3 +184,4 @@ def send_command() -> None:
         session.commit()
 
     action_flag = check_var
+    """

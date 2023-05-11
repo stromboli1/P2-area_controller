@@ -9,7 +9,7 @@ from threading import Thread
 from time import sleep
 import atexit
 
-from data_analysis import send_command
+from data_analysis import param_check, send_command
 
 class RecvUnpack(Thread):
     def run(self):
@@ -56,13 +56,20 @@ class RecvUnpack(Thread):
 
 class SendCommand(Thread):
     def run(self):
+        off_list = []
         while True:
+            sleep(1)
             try:
-                send_command()
+                command = send_command(off_list)
+                if command == None:
+                    continue
+                if command[1] and len(off_list) > 0:
+                    off_list.remove(command[0])
+                elif not command[1]:
+                    off_list.append(command[0])
             except Exception as e:
                 print("Crashed")
                 print(e)
-            sleep(1)
 
 onoff_houses(on_off = True)
 atexit.register(onoff_houses)
