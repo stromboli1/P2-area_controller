@@ -1,10 +1,6 @@
 # imports
 import socket
 
-# create session
-Session = sessionmaker(bind = engine)
-session = Session()
-
 def onoff_houses() -> None:
 
     start_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
