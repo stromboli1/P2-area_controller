@@ -10,5 +10,5 @@ def onoff_houses(on_off = False) -> None:
         start_sock.sendto(b'\x01', ('10.10.0.255', 6969))
         start_sock.close()
     elif not on_off:
-        start_sock.sendto(b'\x00', ('<broadcast>', 6969))
+        start_sock.sendto(b'\x00', ('10.10.0.255', 6969))
         start_sock.close()
