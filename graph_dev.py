@@ -35,4 +35,4 @@ def live_graph():
     ani = animation.FuncAnimation(fig, animate(), interval=200, frames=10)
     
     if len(x) > 1:
-        plt.savefig('graph_file.png')
+        ani.save('graph_file.mp4')
