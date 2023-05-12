@@ -158,7 +158,7 @@ def switch(data_list: list[tuple[int, float, float, int, int]], off_houses: list
                 cand_var = data[2]
                 cand = data[4]
         else:
-            if data[2] < prio_var:
+            if data[2] < prio_var or prio_var == 0:
                 prio_var = data[2]
                 prio = data[4]
 
