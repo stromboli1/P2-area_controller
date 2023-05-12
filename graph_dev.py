@@ -18,6 +18,9 @@ def animate():
         for tuple in data:
             consumption_sum += tuple[1]
         y.append(consumption_sum)
+    else:
+        x.append(0)
+        y.append(0)
 
 
 def live_graph():
