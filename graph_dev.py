@@ -24,4 +24,4 @@ def live_graph():
     session = Session()
 
     ani = animation.FuncAnimation(fig, animate(x=x,y=y), interval=200, frames=10)
-    plt.show()
+    plt.savefig('graph_file.png')
