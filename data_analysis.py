@@ -102,14 +102,18 @@ def send_command(off_houses: list) -> tuple[int, bool] | None:
                 prio_var = data[2]
                 prio = data[4]
 
+    if prio == None:
+        print(f"No candidate send, command: {onoff}")
+        return
+
     # find ip of house to take an action within
     house = session.query(HousePool).filter(HousePool.id == prio).first()
     if house != None:
         prio_ip = house.ip
 
 
-    if prio_ip == None or prio == None:
-        print('yeet')
+    if prio_ip == None:
+        print(f"Worst case: {prio} does have an ip")
         return
 
     # create packet
