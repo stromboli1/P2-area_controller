@@ -8,11 +8,13 @@ from data_analysis import get_data_from_houses
 
 def animate(x, y):
     data = get_data_from_houses()
-    x.append(data[0][3])
-    consumption_sum = 0
-    for tuple in data:
-        consumption_sum += tuple[1]
-    y.append(consumption_sum)
+    if len(data) > 0:
+        x.append(data[0][3])
+        consumption_sum = 0
+        for tuple in data:
+            consumption_sum += tuple[1]
+        y.append(consumption_sum)
+
 
 def live_graph():
     fig = plt.figure()
