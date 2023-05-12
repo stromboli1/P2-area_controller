@@ -120,7 +120,7 @@ def send_command(off_houses: list) -> tuple[int, bool] | None:
     packet = ControlPacket()
     packet.add_devices(onoff, 1)
 
-    print(f'Trying to turn off {prio}')
+    print(f"Command for {prio}, command: {onoff}")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((prio_ip, 42069))
     sock.send(packet.get_packet())
