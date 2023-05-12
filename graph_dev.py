@@ -26,13 +26,8 @@ def animate():
 def live_graph():
     global x
     global y
-    fig = plt.figure()
-    ax1 = fig.add_subplot(1,1,1)
-
-    Session = sessionmaker(bind = engine)
-    session = Session()
-
-    ani = animation.FuncAnimation(fig, animate(), interval=200, frames=10)
+    animate()
+    plt.plot(x,y)
     
     if len(x) > 1:
-        ani.save('graph_file.mp4')
+        plt.savefig("graph_file.png")
