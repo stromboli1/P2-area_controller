@@ -10,6 +10,7 @@ from time import sleep
 import atexit
 
 from data_analysis import param_check, send_command
+from clk_sync import clk_sync
 
 class RecvUnpack(Thread):
     def run(self):
@@ -74,6 +75,12 @@ class SendCommand(Thread):
                 print("Crashed")
                 print(e)
 
+class SendClkSync(Thread):
+    def run(self):
+        while True:
+            sleep(60)
+            clk_sync()
+
 onoff_houses(on_off = True)
 atexit.register(onoff_houses)
 
@@ -82,3 +89,6 @@ recv_unpack.start()
 
 sendcommand = SendCommand()
 sendcommand.start()
+
+send_clk_sync = SendClkSync()
+send_clk_sync.start()
