@@ -6,7 +6,7 @@ from models import HousePool, HDData
 from data_analysis import get_data_from_houses
 
 
-def animate(i, x, y):
+def animate(x, y):
     data = get_data_from_houses()
     x.append(data[0][3])
     consumption_sum = 0
