@@ -63,7 +63,10 @@ class SendCommand(Thread):
                 command = send_command(off_list)
                 if command == None:
                     continue
-                if command[1] and len(off_list) > 0:
+                if type(command[1]) == int:
+                    off_list.append(command[1])
+                    off_list.remove(command[0])
+                elif command[1] and len(off_list) > 0:
                     off_list.remove(command[0])
                 elif not command[1]:
                     off_list.append(command[0])

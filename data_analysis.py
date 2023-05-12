@@ -64,7 +64,7 @@ def param_check(data: list[tuple[int, float, float, int, int]]) -> bool | None:
         return False
     return True
 
-def send_command(off_houses: list) -> tuple[int, bool] | None:
+def send_command(off_houses: list) -> tuple[int, bool] | tuple[int, int] | None:
 
     # variables
     prio_var: float = 0
@@ -74,7 +74,12 @@ def send_command(off_houses: list) -> tuple[int, bool] | None:
     onoff: bool | None = param_check(house_data)
 
     if onoff == None:
-        return
+        if len(off_houses) == 0 or len(off_houses) == len(house_data):
+            return
+        switch_var = switch(house_data, off_houses)
+        if switch_var == None:
+            return
+        return switch_var
 
     # checks whether to turn utilities of or on
     if not onoff:
@@ -124,6 +129,7 @@ def send_command(off_houses: list) -> tuple[int, bool] | None:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((prio_ip, 42069))
     sock.send(packet.get_packet())
+    sock.close()
 
     # ActionPool entry
     action_entry = ActionPool(
@@ -138,54 +144,71 @@ def send_command(off_houses: list) -> tuple[int, bool] | None:
 
     return prio, onoff
 
-    """
-    LEGACY
+def switch(data_list: list[tuple[int, float, float, int, int]], off_houses: list) -> tuple[int, int] | None:
 
-    global action_flag
-    data_list = []
-    ip_list = []
-    id_list = []
+    # variables
+    prio_var = 0
+    prio = None
+    cand_var = 0
+    cand = None
 
-    print('pre-for loop')
-    for house in session.query(HousePool):
-        data = get_data_from_house(house.id)
-        if data == None:
-            print('continues')
-            continue
+    for data in data_list:
+        if data[4] not in off_houses:
+            if data[2] > cand_var:
+                cand_var = data[2]
+                cand = data[4]
+        else:
+            if data[2] < prio_var:
+                prio_var = data[2]
+                prio = data[4]
 
-        data_list.append(data)
-        ip_list.append(house.ip)
-        id_list.append(house.id)
-
-    print(id_list, ip_list)
-
-    check_var = param_check(data_list)
-
-    if check_var == action_flag:
-        print('check_var = action_flag')
+    if prio == None or cand == None:
         return
 
+    if cand_var < prio_var:
+        return
+
+    houses = session.query(HousePool)
+    cand_data = houses.filter(HousePool.id == cand).first()
+    prio_data = houses.filter(HousePool.id == prio).first()
+
+    if cand_data == None or prio_data == None:
+        return
+
+    # create packets and sockets and send
+
     packet = ControlPacket()
-    packet.add_devices(check_var, 1)
-    packet.print_packet()
+    packet.add_devices(False, 1)
 
-    for ip, house_id in zip(ip_list, id_list):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((ip, 42069))
-        print('trying to send')
-        sock.send(packet.get_packet())
-        print('command successfully send')
-        sock.close()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((cand_data.ip, 42069))
+    sock.send(packet.get_packet())
+    sock.close()
 
-        action_entry = ActionPool(
-                timestamp = time(),
-                device = 1,
-                state_change = check_var,
-                house_id = house_id
-                )
+    packet.add_devices(True, 1)
 
-        session.add(action_entry)
-        session.commit()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((prio_data.ip, 42069))
+    sock.send(packet.get_packet())
+    sock.close()
 
-    action_flag = check_var
-    """
+    # create action entry
+
+    action_entry_cand = ActionPool(
+            timestamp = time(),
+            device = 1,
+            state_change = False,
+            house_id = cand
+            )
+
+    action_entry_prio = ActionPool(
+            timestamp = time(),
+            device = 1,
+            state_change = True,
+            house_id = prio
+            )
+
+    session.add_all([action_entry_cand, action_entry_prio])
+    session.commit()
+
+    return prio, cand
