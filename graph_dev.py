@@ -28,6 +28,9 @@ def live_graph():
     global y
     animate()
     plt.plot(x,y)
+    plt.title("Power Consumption")
+    plt.ylabel("kW")
+    plt.xlabel("Seconds")
     
     if len(x) > 1:
-        plt.savefig("graph_file.png")
+        plt.savefig("graph_file.png", dpi=1000)
