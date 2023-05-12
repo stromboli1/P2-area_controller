@@ -211,4 +211,5 @@ def switch(data_list: list[tuple[int, float, float, int, int]], off_houses: list
     session.add_all([action_entry_cand, action_entry_prio])
     session.commit()
 
+    print(f'Switching {prio} with {cand}')
     return prio, cand
