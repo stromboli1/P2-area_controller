@@ -33,4 +33,6 @@ def live_graph():
     session = Session()
 
     ani = animation.FuncAnimation(fig, animate(), interval=200, frames=10)
-    plt.savefig('graph_file.png')
+    
+    if len(x) > 1:
+        plt.savefig('graph_file.png')
