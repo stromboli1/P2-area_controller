@@ -35,7 +35,7 @@ def clk_sync() -> None:
         latest_clk.append(house_data.timestamp)
         house_ips.append(house.ip)
 
-    largest_clk: int = max(latest_clk)
+    largest_clk: int = max(latest_clk+60)
 
     packet = ControlPacket()
     packet.add_clksync(largest_clk)
