@@ -47,5 +47,6 @@ def live_graph():
     plt.xlabel("Seconds")
 
     if len(x) > 1:
-        if len(x) // 1440 >=1 and len(x) % 1440 == 0:
-            plt.savefig(f"graph_file.svg{len(x)//1440}")
+        if x[-1] // 600 >=1 and x[-1] % 600 == 0:
+            name = f"graph_file_{x[-1]//600}.svg"
+            plt.savefig(name)
