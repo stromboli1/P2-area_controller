@@ -47,4 +47,4 @@ def live_graph():
     plt.xlabel("Seconds")
     
     if len(x) > 1:
-        plt.savefig("graph_file.png", dpi=300)
+        plt.savefig("graph_file.svg")
