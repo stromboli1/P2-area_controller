@@ -45,7 +45,7 @@ def live_graph():
     plt.title("Power Consumption")
     plt.ylabel("kW")
     plt.xlabel("Seconds")
-    
+
     if len(x) > 1:
-        if len(x)//1440 >=1:
+        if len(x) // 1440 >=1 and len(x) % 1440 == 0:
             plt.savefig(f"graph_file.svg{len(x)//1440}")
