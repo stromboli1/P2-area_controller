@@ -33,6 +33,8 @@ def live_graph():
     global y
     global x_max
     global x_min
+    x_max = []
+    x_min = []
     animate()
     for i in y:
         x_max.append(x_max_value)
@@ -42,8 +44,8 @@ def live_graph():
     print(x_max)
     print(x_min)
     plt.plot(x,y, '-b')
-    #plt.plot(x_max,y,'--r')
-    #plt.plot(x_min,y, '--y')
+    plt.plot(x_max,y,'--r')
+    plt.plot(x_min,y, '--y')
     plt.title("Power Consumption")
     plt.ylabel("kW")
     plt.xlabel("Seconds")
