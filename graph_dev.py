@@ -48,6 +48,6 @@ def live_graph():
 
     if len(x) > 1:
         if x[-1] // 600 >=1 and x[-1] % 600 == 0:
-            #name = f"graph_file_{x[-1]//600}.svg"
-            name = "graph_file.svg"
+            name = f"graph_file_{x[-1]//600}.svg"
+            #name = "graph_file.svg"
             plt.savefig(name)
