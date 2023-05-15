@@ -40,6 +40,7 @@ def clk_sync() -> None:
     packet = ControlPacket()
     packet.add_clksync(largest_clk)
 
+    print(f'Setting time to: {largest_clk}')
     for ip in house_ips:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((ip, 42069))

@@ -11,6 +11,7 @@ import atexit
 
 from data_analysis import param_check, send_command
 from clk_sync import clk_sync
+from graph_dev import animate, live_graph
 
 class RecvUnpack(Thread):
     def run(self):
@@ -81,6 +82,11 @@ class SendClkSync(Thread):
             sleep(60)
             clk_sync()
 
+class Graph(Thread):
+    def run(self):
+        while True:
+            live_graph()
+
 onoff_houses(on_off = True)
 atexit.register(onoff_houses)
 
@@ -92,3 +98,6 @@ sendcommand.start()
 
 send_clk_sync = SendClkSync()
 send_clk_sync.start()
+
+graph = Graph()
+graph.start()
