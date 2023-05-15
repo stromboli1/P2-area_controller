@@ -37,6 +37,10 @@ def live_graph():
     for i in y:
         x_max.append(x_max_value)
         x_min.append(x_min_value)
+    print(y)
+    print(x)
+    print(x_max)
+    print(x_min)
     plt.plot(x,y, '-b')
     plt.plot(x_max,y,'--r')
     plt.plot(x_min,y, '--y')
