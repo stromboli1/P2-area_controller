@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from sqlalchemy.orm import sessionmaker
-from utils import engine
-from models import HousePool, HDData
 from data_analysis import get_data_from_houses
+import json
+
+with open('anal_param.json', 'r') as fd:
+    anal_params = json.load(fd)
+
+x_max = anal_params["max_usage"]
+x_min = anal_params["min_usage"]
 
 x = []
 y = []
@@ -27,7 +30,9 @@ def live_graph():
     global x
     global y
     animate()
-    plt.plot(x,y)
+    plt.plot(x,y, '-b')
+    plt.plot(x_max,y,'--r')
+    plt.plot(x_min,y, '--y')
     plt.title("Power Consumption")
     plt.ylabel("kW")
     plt.xlabel("Seconds")
