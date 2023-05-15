@@ -5,9 +5,11 @@ import json
 with open('anal_param.json', 'r') as fd:
     anal_params = json.load(fd)
 
-x_max = anal_params["max_usage"]
-x_min = anal_params["min_usage"]
+x_max_value = anal_params["max_usage"]
+x_min_value = anal_params["min_usage"]
 
+x_max = []
+x_min = []
 x = []
 y = []
 
@@ -29,7 +31,12 @@ def animate():
 def live_graph():
     global x
     global y
+    global x_max
+    global x_min
     animate()
+    for i in y:
+        x_max.append(x_max_value)
+        x_min.append(x_min_value)
     plt.plot(x,y, '-b')
     plt.plot(x_max,y,'--r')
     plt.plot(x_min,y, '--y')
