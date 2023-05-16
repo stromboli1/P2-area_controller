@@ -39,14 +39,14 @@ def live_graph():
     for i in x:
         y_max.append(y_max_value)
         y_min.append(y_min_value)
-    plt.plot(x,y, '-b')
-    plt.plot(x,y_max,'--r')
-    plt.plot(x,y_min, '--y')
-    plt.title("Power Consumption")
-    plt.ylabel("kW")
-    plt.xlabel("Seconds")
 
     if len(x) > 1:
         if x[-1] // 3540 >=1 and x[-1] % 3540 == 0:
+            plt.plot(x,y, '-b')
+            plt.plot(x,y_max,'--r')
+            plt.plot(x,y_min, '--y')
+            plt.title("Power Consumption")
+            plt.ylabel("kW")
+            plt.xlabel("Seconds")
             name = f"graph_file_{x[-1]//3540}.png"
             plt.savefig(name, dpi=300)
