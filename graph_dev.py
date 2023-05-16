@@ -10,6 +10,7 @@ with open('anal_param.json', 'r') as fd:
 
 y_max_value = anal_params["max_usage"]
 y_min_value = anal_params["min_usage"]
+max_cap = anal_params["max_capacity"]
 
 y_max = []
 y_min = []
@@ -48,6 +49,7 @@ def live_graph():
             plt.plot(x,y, '-b')
             plt.plot(x,y_max,'--r')
             plt.plot(x,y_min, '--y')
+            plt.plot(x,y_min, '--m')
             plt.title("Power Consumption")
             plt.ylabel("kW")
             plt.xlabel("Seconds")
