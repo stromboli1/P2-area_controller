@@ -77,10 +77,12 @@ def post_plot():
 
     y_max = [y_max_value] * len(timestamps)
     y_min = [y_min_value] * len(timestamps)
+    max_cap_list = [max_cap]*len(timestamps)
 
     plt.plot(timestamps,y_list, '-b')
     plt.plot(timestamps,y_max,'--r')
     plt.plot(timestamps,y_min, '--y')
+    plt.plot(timestamps,max_cap_list, '--m')
     plt.title("Power Consumption")
     plt.ylabel("kW")
     plt.xlabel("Seconds")
