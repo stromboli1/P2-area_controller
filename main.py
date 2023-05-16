@@ -85,6 +85,7 @@ class SendClkSync(Thread):
 class Graph(Thread):
     def run(self):
         while True:
+            sleep(1)
             live_graph()
 
 onoff_houses(on_off = True)
