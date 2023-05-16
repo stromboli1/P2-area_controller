@@ -60,7 +60,7 @@ def post_plot():
     Session = sessionmaker(bind = engine)
     session = Session()
     data_objects = session.query(HDData)
-    if len(data_objects) == 0:
+    if len(data_objects.all()) == 0:
         return
     
     y_list = []
