@@ -84,6 +84,7 @@ class SendClkSync(Thread):
 
 class Graph(Thread):
     def run(self):
+        sleep(30)
         while True:
             live_graph()
 
