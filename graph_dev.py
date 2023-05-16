@@ -65,7 +65,7 @@ def post_plot():
     
     y_list = []
 
-    timestamps = [ts for ts in data_objects.distinct(HDData.timestamp)]
+    timestamps = [ts.timestamp for ts in data_objects.distinct(HDData.timestamp)]
     timestamps.sort()
     for stamp in timestamps:
         y = 0
