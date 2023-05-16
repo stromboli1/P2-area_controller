@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 from data_analysis import get_data_from_houses
 import json
+from models import HousePool, HDData
+from utils import engine
+from sqlalchemy.orm import sessionmaker
 
 with open('anal_param.json', 'r') as fd:
     anal_params = json.load(fd)
@@ -50,3 +53,30 @@ def live_graph():
             plt.xlabel("Seconds")
             name = f"graph_file_{x[-1]//3540}.png"
             plt.savefig(name, dpi=300)
+
+
+
+def post_plot():
+    Session = sessionmaker(bind = engine)
+    session = Session()
+    data_objects = session.query(HDData)
+    if len(data_objects) == 0:
+        return
+    
+    y_list = []
+
+    timestamps = [ts for ts in data_objects.distinct(HDData.timestamp)]
+    timestamps.sort()
+    for stamp in timestamps:
+        y = 0
+        for data in data_objects.filter(HDData.timestamp == stamp):
+            y += data.power_usage
+        y_list.append(y)
+    plt.plot(timestamps,y_list, '-b')
+    plt.plot(timestamps,y_max,'--r')
+    plt.plot(timestamps,y_min, '--y')
+    plt.title("Power Consumption")
+    plt.ylabel("kW")
+    plt.xlabel("Seconds")
+    name = f"graph_file.png"
+    plt.savefig(name, dpi=300)

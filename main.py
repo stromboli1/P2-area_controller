@@ -100,5 +100,5 @@ sendcommand.start()
 send_clk_sync = SendClkSync()
 send_clk_sync.start()
 
-graph = Graph()
-graph.start()
+#graph = Graph()
+#graph.start()
