@@ -72,6 +72,10 @@ def post_plot():
         for data in data_objects.filter(HDData.timestamp == stamp):
             y += data.power_usage
         y_list.append(y)
+
+    y_max = [y_max_value] * len(timestamps)
+    y_min = [y_min_value] * len(timestamps)
+    
     plt.plot(timestamps,y_list, '-b')
     plt.plot(timestamps,y_max,'--r')
     plt.plot(timestamps,y_min, '--y')
