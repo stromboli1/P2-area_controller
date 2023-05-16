@@ -48,5 +48,5 @@ def live_graph():
 
     if len(x) > 1:
         if x[-1] // 3540 >=1 and x[-1] % 3540 == 0:
-            name = f"graph_file_{x[-1]//3540}.svg"
-            plt.savefig(name)
+            name = f"graph_file_{x[-1]//3540}.png"
+            plt.savefig(name, dpi=300)
