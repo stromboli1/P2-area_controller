@@ -38,6 +38,9 @@ class RecvUnpack(Thread):
             unix_timestamp: int = int.from_bytes(data[9:13], 'big')
 
             print(f"Received from {house_addr}: {device_state} {power_usage} {temperature} {unix_timestamp}")
+            
+            if unix_timestamp > 86400:
+                raise Exception('Whole day passed')
 
             #find correct house in database
             house_id = session.query(HousePool).filter(
