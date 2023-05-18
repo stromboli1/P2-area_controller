@@ -50,3 +50,37 @@ def live_graph():
         if x[-1] // 86400 >=1 and x[-1] % 86400 == 0:
             name = f"graph_file_{x[-1]//86400}.svg"
             plt.savefig(name)
+
+def post_plot():
+    Session = sessionmaker(bind = engine)
+    session = Session()
+    data_objects = session.query(HDData)
+    if len(data_objects.all()) == 0:
+        return
+    
+    y_list = []
+
+    timestamps = [ts.timestamp for ts in data_objects.distinct(HDData.timestamp)]
+    timestamps.sort()
+    for stamp in timestamps:
+        y = 0
+        for data in data_objects.filter(HDData.timestamp == stamp):
+            y += data.power_usage
+        y_list.append(y)
+
+    y_max = [y_max_value] * len(timestamps)
+    y_min = [y_min_value] * len(timestamps)
+    max_cap_list = [max_cap]*len(timestamps)
+
+    plt.plot(timestamps,y_list, '-b')
+    plt.plot(timestamps,y_max,'--r')
+    plt.plot(timestamps,y_min, '--y')
+    plt.plot(timestamps,max_cap_list, '--m')
+    plt.title("Power Consumption")
+    plt.ylabel("kW")
+    plt.xlabel("Seconds")
+    name = f"graph_file.png"
+    plt.savefig(name, dpi=300)
+
+
+post_plot()

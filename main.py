@@ -82,11 +82,6 @@ class SendClkSync(Thread):
             sleep(60)
             clk_sync()
 
-class Graph(Thread):
-    def run(self):
-        while True:
-            live_graph()
-
 onoff_houses(on_off = True)
 atexit.register(onoff_houses)
 
@@ -98,6 +93,3 @@ sendcommand.start()
 
 send_clk_sync = SendClkSync()
 send_clk_sync.start()
-
-graph = Graph()
-graph.start()
