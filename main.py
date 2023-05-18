@@ -91,8 +91,8 @@ atexit.register(onoff_houses)
 recv_unpack = RecvUnpack()
 recv_unpack.start()
 
-sendcommand = SendCommand()
-sendcommand.start()
+#sendcommand = SendCommand()
+#sendcommand.start()
 
-send_clk_sync = SendClkSync()
-send_clk_sync.start()
+#send_clk_sync = SendClkSync()
+#send_clk_sync.start()
