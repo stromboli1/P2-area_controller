@@ -1,5 +1,5 @@
 {
-	"max_usage": 5,
-	"min_usage": 4,
+	"max_usage": 4.5,
+	"min_usage": 3.5,
 	"max_capacity": 6
 }
