@@ -39,7 +39,7 @@ class RecvUnpack(Thread):
 
             print(f"Received from {house_addr}: {device_state} {power_usage} {temperature} {unix_timestamp}")
             
-            if unix_timestamp > 86400:
+            if unix_timestamp > 86460:
                 raise Exception('Whole day passed')
 
             #find correct house in database
