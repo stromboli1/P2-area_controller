@@ -1,12 +1,16 @@
 import matplotlib.pyplot as plt
 from data_analysis import get_data_from_houses
 import json
+from models import HousePool, HDData
+from utils import engine
+from sqlalchemy.orm import sessionmaker
 
 with open('anal_param.json', 'r') as fd:
     anal_params = json.load(fd)
 
 y_max_value = anal_params["max_usage"]
 y_min_value = anal_params["min_usage"]
+max_cap = anal_params["max_capacity"]
 
 y_max = []
 y_min = []
@@ -39,17 +43,20 @@ def live_graph():
     for i in x:
         y_max.append(y_max_value)
         y_min.append(y_min_value)
-    plt.plot(x,y, '-b')
-    plt.plot(x,y_max,'--r')
-    plt.plot(x,y_min, '--y')
-    plt.title("Power Consumption")
-    plt.ylabel("kW")
-    plt.xlabel("Seconds")
 
     if len(x) > 1:
-        if x[-1] // 86400 >=1 and x[-1] % 86400 == 0:
-            name = f"graph_file_{x[-1]//86400}.svg"
-            plt.savefig(name)
+        if x[-1] // 3540 >=1 and x[-1] % 3540 == 0:
+            plt.plot(x,y, '-b')
+            plt.plot(x,y_max,'--r')
+            plt.plot(x,y_min, '--y')
+            plt.plot(x,y_min, '--m')
+            plt.title("Power Consumption")
+            plt.ylabel("kW")
+            plt.xlabel("Seconds")
+            name = f"graph_file_{x[-1]//3540}.png"
+            plt.savefig(name, dpi=300)
+
+
 
 def post_plot():
     Session = sessionmaker(bind = engine)
