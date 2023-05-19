@@ -1,3 +1,5 @@
+# models.py
+
 from sqlalchemy import String, Integer, Float, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 

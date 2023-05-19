@@ -1,3 +1,5 @@
+# control_protocol.py
+
 from typing import Union, Optional, Self
 import struct
 import json
